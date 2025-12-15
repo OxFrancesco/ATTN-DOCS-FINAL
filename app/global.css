@@ -1,3 +1,103 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+@theme {
+  --font-sans: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+  
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+}
+
+/* Light UI (Clear & Editorial) */
+:root {
+  /* Editorial White Background */
+  --background: 0 0% 100%; /* #FFFFFF */
+  --foreground: 0 0% 4%; /* #0A0A0A */
+  
+  /* Surface: #F0F1F2 for Cards/Panels */
+  --card: 210 8% 95%; 
+  --card-foreground: 0 0% 4%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 4%;
+  
+  /* Brand Accent as Primary */
+  --primary: 350 90% 49%; /* #ED0C32 */
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary Surfaces */
+  --secondary: 210 8% 95%; /* #F0F1F2 */
+  --secondary-foreground: 0 0% 9%;
+  
+  --muted: 210 8% 95%; /* #F0F1F2 */
+  --muted-foreground: 216 2% 39%; /* #5F6368 */
+  
+  /* UI Interaction Accent (Subtle Gray, not Brand Red) */
+  --accent: 210 8% 95%; /* #F0F1F2 */
+  --accent-foreground: 0 0% 9%;
+  
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  
+  /* Borders: #DFE0E1 */
+  --border: 210 1% 87%; 
+  --input: 210 1% 87%;
+  --ring: 350 90% 49%; /* Brand Red Ring */
+  
+  --radius: 0.5rem;
+}
+
+/* Dark UI (Immersive & Bold) */
+.dark {
+  --background: 0 0% 4%; /* #0A0A0A */
+  --foreground: 0 0% 100%; /* #FFFFFF */
+  
+  /* Surface: #1A1A1A */
+  --card: 0 0% 10%; 
+  --card-foreground: 0 0% 100%;
+  
+  --popover: 0 0% 10%;
+  --popover-foreground: 0 0% 100%;
+  
+  --primary: 350 90% 49%; /* #ED0C32 */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 100%;
+  
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 80%; /* #CCCCCC */
+  
+  --accent: 0 0% 10%;
+  --accent-foreground: 0 0% 100%;
+  
+  --destructive: 350 90% 49%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Borders: #3B3B3B */
+  --border: 0 0% 23%;
+  --input: 0 0% 23%;
+  --ring: 350 90% 49%;
+}
+
+body {
+  @apply bg-background text-foreground;
+}
