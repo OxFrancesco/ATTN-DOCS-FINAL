@@ -13,6 +13,7 @@ export function baseOptions(): BaseLayoutProps {
             width={360}
             height={96}
             className="dark:hidden w-auto h-[4.5rem] md:h-24"
+            style={{ width: 'auto' }}
             priority
           />
           <Image
@@ -21,6 +22,7 @@ export function baseOptions(): BaseLayoutProps {
             width={360}
             height={96}
             className="hidden dark:block w-auto h-[4.5rem] md:h-24"
+            style={{ width: 'auto' }}
             priority
           />
         </div>

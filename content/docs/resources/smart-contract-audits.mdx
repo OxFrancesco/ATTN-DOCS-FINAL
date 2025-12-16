@@ -1,0 +1,122 @@
+---
+title: Smart Contract Audits
+description: ""
+---
+
+AttentionPad prioritizes user safety and project integrity across every stage of the fundraising process. To support this, all core smart contracts used by the platform undergo independent security audits performed by reputable third-party firms. These audits help ensure that the contracts governing token sales, staking, vesting, and distribution operate securely and as intended.
+
+Below is a summary of the audits completed for AttentionPad’s core infrastructure. Full reports will be added once the final versions are published.
+
+---
+
+### **AttentionPad Core Contracts**
+
+#### **Sale Contract Suite**
+
+**Status:** Audited  
+**Auditor:** *\[Audit Firm Name\]*  
+**Date:** *\[MM YYYY\]*  
+**Scope:**
+
+* FCFS Fixed-price sales  
+* Allocation calculation  
+* Cross-chain swap  
+* Contribution requirements verification  
+* Contribution verification  
+* Anti-bot timestamp and wallet validation mechanisms
+
+**Summary:**  
+The auditor conducted a full security assessment of the sale contract module, including logic review, edge-case testing, automated static analysis, and manual inspection. No critical or high-severity vulnerabilities were identified. Minor optimizations were recommended and subsequently implemented.
+
+**Report:** *\[PDF link will be inserted here\]*
+
+#### **Staking Contracts**
+
+**Status:** Audited  
+**Auditor:** *\[Audit Firm Name\]*  
+**Date:** *\[MM YYYY\]*  
+**Scope:**
+
+* $ATTN token staking  
+* Epoch and lockup logic  
+* Reward accrual  
+* Reward distribution  
+* Early unstake penalty mechanism
+
+**Summary:**  
+The staking module passed all tests related to fund safety, reward distribution, and tier calculation determinism. The audit verified correct handling of lock periods, penalty logic, and tier thresholds across multiple user paths.
+
+**Report:** *\[PDF link will be inserted here\]*
+
+### **Token Distribution & Vesting**
+
+#### **Vesting Contract Suite**
+
+**Status:** Audited  
+**Auditor:** *\[Audit Firm Name\]*  
+**Date:** *\[MM YYYY\]*  
+**Scope:**
+
+* Linear and cliff vesting  
+* Multi-chain claim support  
+* Beneficiary management  
+* Emergency pause controls  
+* TGE configurations
+
+**Summary:**  
+The auditors validated the vesting logic under multiple load conditions, time simulations, and cross-chain call environments. No vulnerabilities were found that impact the safety of beneficiary funds. A gas optimization improvement was added following auditor recommendations.
+
+**Report:** *\[PDF link will be inserted here\]*
+
+### **Attention Points & Rewards Module**
+
+#### **Points Accrual & Burn Logic**
+
+**Status:** Audited  
+**Auditor:** *\[Audit Firm Name\]*  
+**Date:** *\[MM YYYY\]*  
+**Scope:**
+
+* Points earning logic  
+* Commit/Burn mechanics  
+* Reward multipliers  
+* Epoch-based reward calculations
+
+**Summary:**  
+The audit confirmed predictable behavior for point accrual, stable reward calculations under heavy usage, and correct propagation of multipliers. All findings were informational in nature.
+
+**Report:** *\[PDF link will be inserted here\]*
+
+### **Project Token Audits**
+
+AttentionPad requires every project launching through the platform to submit a third-party audit of their token contract or to undergo an audit coordinated through our partners. These audits typically include:
+
+* token standard compliance  
+* mint/burn logic and permissions  
+* supply controls  
+* blacklist/whitelist functions  
+* upgradeability risks  
+* ownership and admin roles
+
+Audit reports for each individual token sale will be listed on their respective launch pages.
+
+### **Ongoing Security Practices**
+
+In addition to third-party audits, AttentionPad employs several internal and ecosystem-level security practices:
+
+* Automated static analysis and linting during development  
+* Deployment verification and bytecode consistency checks  
+* Continuous monitoring of token supply and admin-role changes  
+* Pause mechanisms for core contracts  
+* Bug reporting channels for ethical researchers
+
+These measures complement the audit process and ensure long-term resilience of the platform.
+
+### **Upcoming Audits**
+
+The following contracts are scheduled for auditing as part of future platform upgrades:
+
+* AttentionPad v2 contract suite  
+* Multi-chain execution integrations
+
+This page will be updated with new reports as soon as auditing firms publish their findings.

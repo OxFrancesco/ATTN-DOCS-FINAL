@@ -1,15 +1,22 @@
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from "fs";
 import { join } from "path";
+
+// Types for our content structure
+interface Page {
+  title: string;
+  slug: string;
+  content: string;
+}
 
 interface Section {
   title: string;
-  content: string;
   slug: string;
+  pages: Page[];
 }
 
-// Map section titles to file slugs
-const sectionMap: Record<string, string> = {
-  "INTRODUCTION": "index",
+// Configuration maps
+const sectionSlugMap: Record<string, string> = {
+  "INTRODUCTION": "introduction",
   "GETTING STARTED": "getting-started",
   "TOKEN SALE FORMATS": "token-sales",
   "ACCESS & STAKING": "access-staking",
@@ -20,9 +27,8 @@ const sectionMap: Record<string, string> = {
   "RESOURCES": "resources",
 };
 
-// Map slugs to frontmatter titles
-const titleMap: Record<string, string> = {
-  index: "Introduction",
+const sectionTitleMap: Record<string, string> = {
+  "introduction": "Introduction",
   "getting-started": "Getting Started",
   "token-sales": "Token Sale Formats",
   "access-staking": "Access & Staking",
@@ -30,139 +36,198 @@ const titleMap: Record<string, string> = {
   "participant-protection": "Participant Protection",
   "for-projects": "For Projects",
   "token-economy": "Token & Economy",
-  resources: "Resources",
-};
-
-// Map slugs to descriptions
-const descriptionMap: Record<string, string> = {
-  index: "Welcome to AttentionPad - The next-generation multi-chain launchpad.",
-  "getting-started": "Learn how to create your account, complete KYC, and participate in sales.",
-  "token-sales": "Explore different token sale formats available on AttentionPad.",
-  "access-staking": "Learn about staking $ATTN and accessing token sales.",
-  "community-intelligence": "Understand how community intelligence powers project evaluation.",
-  "participant-protection": "Learn about the protection mechanisms in place for participants.",
-  "for-projects": "Everything projects need to know about launching on AttentionPad.",
-  "token-economy": "Learn about $ATTN token utility, distribution, and economics.",
-  resources: "Useful links, audits, legal documents, and resources.",
+  "resources": "Resources",
 };
 
 function parseMarkdown(content: string): Section[] {
   const sections: Section[] = [];
   const lines = content.split("\n");
-  
+
+  // State tracking
   let currentSection: Section | null = null;
+  let currentPage: Page | null = null;
   let currentContent: string[] = [];
-  
+
+  // Helper to save current page
+  const saveCurrentPage = () => {
+    if (currentPage && currentSection) {
+      currentPage.content = currentContent.join("\n").trim();
+
+      // Handle Index Page Logic
+      if (currentPage.slug === "index") {
+        if (currentPage.content.length === 0) {
+          // Skip empty index pages (avoids "Introduction" -> "Introduction" duplication)
+          currentPage = null;
+          currentContent = [];
+          return;
+        } else {
+          // Rename non-empty index pages to "Overview"
+          currentPage.title = "Overview";
+        }
+      }
+
+      // Add if valid
+      if (currentPage.content || currentPage.title) {
+        currentSection.pages.push(currentPage);
+      }
+      currentContent = [];
+      currentPage = null;
+    }
+  };
+
+  const saveCurrentSection = () => {
+    saveCurrentPage();
+    if (currentSection) {
+      sections.push(currentSection);
+      currentSection = null;
+    }
+  };
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    
-    // Check if this is a top-level heading (# **SECTION NAME**)
-    const topLevelMatch = line.match(/^#\s+\*\*(.+?)\*\*$/);
-    
-    if (topLevelMatch) {
-      // Save previous section if exists
-      if (currentSection) {
-        currentSection.content = currentContent.join("\n").trim();
-        sections.push(currentSection);
-      }
-      
-      // Start new section
-      const sectionTitle = topLevelMatch[1].trim();
-      const slug = sectionMap[sectionTitle] || sectionTitle.toLowerCase().replace(/\s+/g, "-");
-      
+
+    // Level 1: New Section / Directory (# **TITLE**)
+    // Matches "# **TITLE**" or "# TITLE"
+    const l1Match = line.match(/^#\s+(?:\*\*)?(.+?)(?:\*\*)?$/);
+
+    // Level 2: New Page / File (## **TITLE**)
+    // Matches "## **TITLE**" or "## TITLE"
+    const l2Match = line.match(/^##\s+(?:\*\*)?(.+?)(?:\*\*)?$/);
+
+    if (l1Match) {
+      saveCurrentSection();
+      const title = l1Match[1].trim();
+      const slug = sectionSlugMap[title] || title.toLowerCase().replace(/\s+/g, "-");
+
       currentSection = {
-        title: sectionTitle,
-        content: "",
+        title,
         slug,
+        pages: []
       };
-      currentContent = [];
-    } else if (currentSection) {
-      currentContent.push(line);
+
+      // Start the 'index' page for this section immediately to capture H1 content
+      currentPage = {
+        title: sectionTitleMap[slug] || title, // Use mapped title for nice display
+        slug: "index",
+        content: ""
+      };
+
+    } else if (l2Match) {
+      const title = l2Match[1].trim();
+
+      // Special logic for Roadmap: Merge "Q1-Q4" headers into the previous page
+      const isRoadmapEx = /^Q[1-4]/.test(title);
+
+      if (isRoadmapEx && currentPage) {
+        // Append as a subsection instead of a new page
+        // Convert H2 to H2 (MDX supports H2) but since we are merging, it's effectively a section in the page.
+        currentContent.push(`\n## ${title}\n`);
+      } else {
+        saveCurrentPage();
+
+        let slug = title.toLowerCase()
+          .replace(/[^\w\s-]/g, "") // Remove special chars
+          .replace(/\s+/g, "-"); // Spaces to dashes
+
+        if (slug === "") slug = "page";
+
+        currentPage = {
+          title,
+          slug,
+          content: ""
+        };
+      }
+    } else {
+      // Content handling
+      if (currentPage) {
+        currentContent.push(line);
+      } else if (currentSection && !currentPage) {
+        // Should not happen if we init index page on H1
+        // But just in case
+        currentPage = {
+          title: "Overview",
+          slug: "index",
+          content: ""
+        };
+        currentContent.push(line);
+      }
     }
   }
-  
-  // Don't forget the last section
-  if (currentSection) {
-    currentSection.content = currentContent.join("\n").trim();
-    sections.push(currentSection);
-  }
-  
+
+  saveCurrentSection();
   return sections;
 }
 
-function generateFrontmatter(slug: string): string {
-  const title = titleMap[slug] || slug;
-  const description = descriptionMap[slug] || `${title} documentation for AttentionPad.`;
-  
+function generateFrontmatter(title: string, description: string): string {
   return `---
 title: ${title}
-description: ${description}
+description: "${description}"
 ---`;
 }
 
 function cleanContent(content: string): string {
-  // Remove excessive blank lines (more than 2 consecutive)
-  let cleaned = content.replace(/\n{3,}/g, "\n\n");
-  
-  // Clean up any markdown formatting issues
-  // Fix escaped characters in markdown links
-  cleaned = cleaned.replace(/\\!/g, "!");
-  
-  // Ensure proper spacing around headings
-  cleaned = cleaned.replace(/(\n)(#{1,6}\s+\*\*)/g, "\n\n$2");
-  
-  return cleaned.trim();
+  // Fix images: ![Chart][image1] -> ![Chart](/images/image1.png) if we had them.
+  // For now, just keep text clean.
+  return content
+    .replace(/\n{3,}/g, "\n\n")
+    // Fix checklist rendering
+    .replace(/\[x\]/g, "[x]")
+    .replace(/\[ \]/g, "[ ]")
+    .trim();
 }
 
-function generateMDX(section: Section): string {
-  const frontmatter = generateFrontmatter(section.slug);
-  const content = cleanContent(section.content);
-  
-  return `${frontmatter}\n\n${content}\n`;
-}
-
-function updateMetaJson(sections: Section[]): void {
-  const metaPath = join(process.cwd(), "content", "docs", "meta.json");
-  const pages = sections.map((s) => s.slug).filter((slug) => slug !== "index");
-  
-  // Insert index at the beginning
-  pages.unshift("index");
-  
+function updateRootMeta(sections: Section[], outputDir: string) {
   const meta = {
-    pages,
+    pages: sections.map(s => s.slug)
   };
-  
-  writeFileSync(metaPath, JSON.stringify(meta, null, 2) + "\n");
+  writeFileSync(join(outputDir, "meta.json"), JSON.stringify(meta, null, 2));
+}
+
+function updateFolderMeta(section: Section, sectionDir: string) {
+  const meta = {
+    pages: section.pages.map(p => p.slug)
+  };
+  writeFileSync(join(sectionDir, "meta.json"), JSON.stringify(meta, null, 2));
 }
 
 function main() {
   const inputPath = join(process.cwd(), "references", "20251209 - Gitbook draft.md");
   const outputDir = join(process.cwd(), "content", "docs");
-  
-  console.log("Reading Gitbook draft...");
+
+  console.log(`Reading from ${inputPath}`);
   const content = readFileSync(inputPath, "utf-8");
-  
-  console.log("Parsing sections...");
   const sections = parseMarkdown(content);
-  
-  console.log(`Found ${sections.length} sections:`);
-  sections.forEach((section) => {
-    console.log(`  - ${section.title} -> ${section.slug}.mdx`);
-  });
-  
-  console.log("\nGenerating MDX files...");
-  sections.forEach((section) => {
-    const mdxContent = generateMDX(section);
-    const outputPath = join(outputDir, `${section.slug}.mdx`);
-    writeFileSync(outputPath, mdxContent, "utf-8");
-    console.log(`  ✓ Created ${section.slug}.mdx`);
-  });
-  
-  console.log("\nUpdating meta.json...");
-  updateMetaJson(sections);
-  console.log("  ✓ Updated meta.json");
-  
-  console.log("\n✅ Done! All sections have been converted to MDX files.");
+
+  // Clean output dir first (safety: ensure we only delete known docs structure if needed, 
+  // but for now, let's just overwrite/add. Actually better to clean to remove old flat files)
+  // BE CAREFUL: Don't delete metadata if not regenerated.
+  // We are regenerating all metadata, so aggressive clean is fine for content/docs sub-items.
+  // But let's just overwrite for safety against deleting user custom stuff.
+
+  console.log(`Parsed ${sections.length} sections.`);
+
+  for (const section of sections) {
+    const sectionDir = join(outputDir, section.slug);
+    if (!existsSync(sectionDir)) {
+      mkdirSync(sectionDir, { recursive: true });
+    }
+
+    // Generate pages
+    for (const page of section.pages) {
+      const filePath = join(sectionDir, `${page.slug}.mdx`);
+      const fileContent = `${generateFrontmatter(page.title, "")}\n\n${cleanContent(page.content)}`;
+      writeFileSync(filePath, fileContent);
+      console.log(`  Wrote ${section.slug}/${page.slug}.mdx`);
+    }
+
+    // Generate folder meta
+    updateFolderMeta(section, sectionDir);
+  }
+
+  // Generate root meta
+  updateRootMeta(sections, outputDir);
+
+  console.log("Done! Migration complete.");
 }
 
 main();
