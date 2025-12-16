@@ -4,7 +4,7 @@
 
 @theme {
   --font-sans: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
-  
+
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -29,69 +29,81 @@
 /* Light UI (Clear & Editorial) */
 :root {
   /* Editorial White Background */
-  --background: 0 0% 100%; /* #FFFFFF */
-  --foreground: 0 0% 4%; /* #0A0A0A */
-  
+  --background: 0 0% 100%;
+  /* #FFFFFF */
+  --foreground: 0 0% 4%;
+  /* #0A0A0A */
+
   /* Surface: #F0F1F2 for Cards/Panels */
-  --card: 210 8% 95%; 
+  --card: 210 8% 95%;
   --card-foreground: 0 0% 4%;
-  
+
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 4%;
-  
+
   /* Brand Accent as Primary */
-  --primary: 350 90% 49%; /* #ED0C32 */
+  --primary: 350 90% 49%;
+  /* #ED0C32 */
   --primary-foreground: 0 0% 100%;
-  
+
   /* Secondary Surfaces */
-  --secondary: 210 8% 95%; /* #F0F1F2 */
+  --secondary: 210 8% 95%;
+  /* #F0F1F2 */
   --secondary-foreground: 0 0% 9%;
-  
-  --muted: 210 8% 95%; /* #F0F1F2 */
-  --muted-foreground: 216 2% 39%; /* #5F6368 */
-  
+
+  --muted: 210 8% 95%;
+  /* #F0F1F2 */
+  --muted-foreground: 216 2% 39%;
+  /* #5F6368 */
+
   /* UI Interaction Accent (Subtle Gray, not Brand Red) */
-  --accent: 210 8% 95%; /* #F0F1F2 */
+  --accent: 210 8% 95%;
+  /* #F0F1F2 */
   --accent-foreground: 0 0% 9%;
-  
+
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
-  
+
   /* Borders: #DFE0E1 */
-  --border: 210 1% 87%; 
+  --border: 210 1% 87%;
   --input: 210 1% 87%;
-  --ring: 350 90% 49%; /* Brand Red Ring */
-  
+  --ring: 350 90% 49%;
+  /* Brand Red Ring */
+
   --radius: 0.5rem;
 }
 
 /* Dark UI (Immersive & Bold) */
 .dark {
-  --background: 0 0% 4%; /* #0A0A0A */
-  --foreground: 0 0% 100%; /* #FFFFFF */
-  
+  --background: 0 0% 4%;
+  /* #0A0A0A */
+  --foreground: 0 0% 100%;
+  /* #FFFFFF */
+
   /* Surface: #1A1A1A */
-  --card: 0 0% 10%; 
+  --card: 0 0% 10%;
   --card-foreground: 0 0% 100%;
-  
+
   --popover: 0 0% 10%;
   --popover-foreground: 0 0% 100%;
-  
-  --primary: 350 90% 49%; /* #ED0C32 */
+
+  --primary: 350 90% 49%;
+  /* #ED0C32 */
   --primary-foreground: 0 0% 100%;
-  
+
   --secondary: 0 0% 10%;
   --secondary-foreground: 0 0% 100%;
-  
+
   --muted: 0 0% 10%;
-  --muted-foreground: 0 0% 80%; /* #CCCCCC */
-  
+  --muted-foreground: 0 0% 80%;
+  /* #CCCCCC */
+
   --accent: 0 0% 10%;
   --accent-foreground: 0 0% 100%;
-  
+
   --destructive: 350 90% 49%;
   --destructive-foreground: 0 0% 100%;
-  
+
   /* Borders: #3B3B3B */
   --border: 0 0% 23%;
   --input: 0 0% 23%;
@@ -100,4 +112,39 @@
 
 body {
   @apply bg-background text-foreground;
+}
+
+/* Sidebar padding for better spacing */
+#nd-sidebar,
+aside[data-sidebar] {
+  padding-top: 1rem !important;
+  padding-left: 1rem !important;
+}
+
+/* Custom sidebar layout: put collapse button and search on same line */
+/* Target the sidebar container and use CSS Grid to rearrange the header elements */
+#nd-sidebar>div:first-child,
+aside[data-sidebar]>div:first-child {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+/* Collapse button (first in DOM) - move to right (column 2) */
+#nd-sidebar>div:first-child>*:first-child,
+aside[data-sidebar]>div:first-child>*:first-child {
+  grid-column: 2;
+  grid-row: 1;
+  flex-shrink: 0;
+}
+
+/* Search bar (last in DOM) - move to left (column 1), takes full width */
+#nd-sidebar>div:first-child>*:last-child,
+aside[data-sidebar]>div:first-child>*:last-child {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
 }

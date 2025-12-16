@@ -10,23 +10,23 @@ export function baseOptions(): BaseLayoutProps {
           <Image
             src="/Logo-Light.svg"
             alt="AttentionPad"
-            width={240}
-            height={64}
-            className="dark:hidden w-auto h-12 md:h-16"
+            width={360}
+            height={96}
+            className="dark:hidden w-auto h-[4.5rem] md:h-24"
             priority
           />
           <Image
             src="/Logo-Dark.svg"
             alt="AttentionPad"
-            width={240}
-            height={64}
-            className="hidden dark:block w-auto h-12 md:h-16"
+            width={360}
+            height={96}
+            className="hidden dark:block w-auto h-[4.5rem] md:h-24"
             priority
           />
         </div>
       ),
       transparentMode: 'top',
     },
-    githubUrl: 'https://github.com/AttentionPad', 
+    githubUrl: 'https://github.com/AttentionPad',
   };
 }

@@ -1,6 +1,18 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import { Rubik } from 'next/font/google';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'AttentionPad',
+    template: '%s | AttentionPad',
+  },
+  description: 'AttentionPad Documentation',
+  icons: {
+    icon: '/favicon.svg',
+  },
+};
 
 const rubik = Rubik({
   subsets: ['latin'],
